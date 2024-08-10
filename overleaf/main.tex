@@ -1,0 +1,157 @@
+
+%
+\documentclass[10pt,1p,sort&compress]{elsarticle}
+
+% 5p gir 2 kolonner pr side. 1p gir 1 kolonne pr side.
+% Valget sort&compress gjør at referansen [1,2,3] settes som [1-3]. 
+
+% Klassen elsarticle er laget for bruk i engelskspråklige tiksskrift. I blokken under bruker vi litt lavnivå TeX-magi for å redefinere bunnteksten på tittelsiden. Ikke bekymre deg for denne biten med kode, det som kommer lengere nede i dokumentet er lettere å forstå!
+\makeatletter
+\def\ps@pprintTitle{%
+ \let\@oddhead\@empty
+ \let\@evenhead\@empty
+ \def\@oddfoot{\footnotesize\itshape
+       %Utkast levert til Veileder	% Bytt ut "Veileder" med navnet på veilederen din!
+       \hfill\today}%
+ \let\@evenfoot\@oddfoot}
+\makeatother
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{gensymb}
+\usepackage{lmodern}
+\usepackage[fixlanguage]{babelbib}
+\renewenvironment{abstract}{\global\setbox\absbox=\vbox\bgroup
+\hsize=\textwidth\def\baselinestretch{1}%
+\noindent\unskip\textbf{Sammendrag}
+\par\medskip\noindent\unskip\ignorespaces}
+{\egroup}
+
+\usepackage[babel=true]{microtype}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+
+\usepackage{siunitx}
+ 
+\sisetup{
+exponent-product = \cdot,
+output-decimal-marker  =  {,}, % Pass på å endre desimalskilletegnet til punktum om du skriver på engelsk!
+separate-uncertainty = true,
+per-mode = symbol,
+group-digits = false,
+}
+
+% Figurer og tabeller
+\usepackage{graphicx} % Denne pakken er standard for å kunne laste inn figurfiler med ulike formater
+% Løsne opp på de alt for strenge standardinstillingene for plassering av figurer og tabeller (floats) i LaTeX-kjernen
+\renewcommand{\topfraction}{.85}
+\renewcommand{\bottomfraction}{.7}
+\renewcommand{\textfraction}{.15}
+\renewcommand{\floatpagefraction}{.66}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{10}
+\usepackage{flafter} % For å plassere floats i PDFen første sted LaTeX tillater etter det punktet de er definert i TeX-filen. Om du definerer figuren i TeX-filen rett etter at du refererer til den for første gang vil denne pakken sørge for at de fleste floats havner på greie steder
+\usepackage{booktabs} % Denne pakken gir tilgang på endel ekstra kommandoer som legger til rette for god skikk og bruk i tabellformatering.
+\usepackage{multirow}
+\usepackage[font=small,labelfont=bf]{caption}	% Justering av LaTeX standarder for figurtekst og tabelltekst.
+% Hyperreferanser
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+
+% Vi endrer fonten som brukes for URLer til den vanlige tekstfonten.
+\urlstyle{same}
+\usepackage{blindtext} % Package to generate dummy text
+
+\addtolength{\hoffset}{-1.9cm}
+\addtolength{\textwidth}{3.7cm}
+\addtolength{\voffset}{-3.25cm}
+\addtolength{\textheight}{5cm}
+\setlength{\parskip}{0pt}
+\setlength{\parindent}{0in}
+
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Eivind Kolmannskog}
+\chead{TEP4112 Turbulent flows}
+\rhead{Cheat Sheet}
+\usepackage{enumitem} % For customizing lists
+\usepackage{cleveref}
+\usepackage{multirow}
+
+
+
+
+% Python codes
+\usepackage{tcolorbox}
+\tcbuselibrary{minted,breakable,xparse,skins}
+
+%\definecolor{bg}{rgb}{0.95686, 0.95686, 0.95686}
+\definecolor{bg}{rgb}{0.945098, 0.952941, 1}
+\DeclareTCBListing{mintedbox}{O{}m!O{}}{%
+  breakable=true,
+  listing engine=minted,
+  listing only,
+  minted language=#2,
+  minted style=default,
+  minted options={%
+    linenos,
+    gobble=0,
+    breaklines=true,
+    breakafter=,,
+    fontsize=\small,
+    numbersep=8pt,
+    #1},
+  boxsep=0pt,
+  left skip=0pt,
+  right skip=0pt,
+  left=25pt,
+  right=0pt,
+  top=3pt,
+  bottom=3pt,
+  arc=5pt,
+  leftrule=0pt,
+  rightrule=0pt,
+  bottomrule=2pt,
+  toprule=2pt,
+  colback=bg,
+  colframe=blue!70,
+  enhanced,
+  overlay={%
+    \begin{tcbclipinterior}
+    \fill[blue!20!white] (frame.south west) rectangle ([xshift=20pt]frame.north west);
+    \end{tcbclipinterior}},
+  #3}
+
+\usepackage[onehalfspacing]{setspace}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Selve dokumentet
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\begin{document}
+
+\begin{figure}
+\centering 
+\includegraphics[width=1\textwidth]{results/plot.png}
+\caption{Figurtext}
+\label{fig:"label"} 
+\end{figure}
+
+\end{document}
+
+
+
+
+%Hjelpekoder%
+
+\begin{figure}
+\centering 
+\includegraphics[width=1\textwidth]{filnavn}
+\caption{Figurtext}
+\label{fig:"label"} 
+\end{figure}
