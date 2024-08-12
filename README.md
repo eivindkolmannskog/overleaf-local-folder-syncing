@@ -2,8 +2,15 @@ This is a tool for automatrically sync a folder within a dev environment with ov
 
 
 
-
 ### Setup
+First we need to set up a dropbox account or use an existing one, and with this account allow this app to be synced.
+
+1. Go to https://www.dropbox.com/developers/apps and click "Create app", and follow the steps. This should give you an app key and an app secret, which we will need very soon.
+2. Install the module using pip install
+
+
+
+### Contribute
 1. Clone repository locally.
 2. Navigate to the folder where you saved it.
 3. Make a virtual environment:
