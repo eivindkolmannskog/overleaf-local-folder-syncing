@@ -1,6 +1,5 @@
-Repository for our project thesis:
+This is a tool for automatrically sync a folder within a dev environment with overleaf, going through Dropbox. This is perfect for scientific writing when plots generated locally needs to be able to be updated without the hassle of upload manually each time.
 
-Verification of lighter and cost effective 15MW floating Wind turbine (FWT) considering all the design and operational parameters
 
 
 
