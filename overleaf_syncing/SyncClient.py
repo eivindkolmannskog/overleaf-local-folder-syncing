@@ -2,6 +2,7 @@ from dropbox import Dropbox
 import os
 from .utilities import search_for_file_in_parent_folders, load_yaml_file, save_yaml_file, create_new_config_file, request_user_input
 from .api_requests import send_folder_to_dropbox
+from pprint import pprint
 
 
 class SyncClient:
@@ -32,7 +33,7 @@ class SyncClient:
         while not self.is_authenticated:
             try:
                 #access_token: str = fetch_access_token(self._app_key, self._app_secret)
-                self.dropbox_client: Dropbox = Dropbox(oauth2_access_token=self._access_token)
+                self.dropbox_client: Dropbox = Dropbox(oauth2_access_token=self._access_token, app_key=self._app_key, app_secret=self._app_secret)
                 print("Authentication successful")
                 self.is_authenticated = True
             except:
@@ -73,8 +74,18 @@ class SyncClient:
         self._save_configuration()
 
     def _sync_directories(self):
-        for dir in self.synced_dirs:
-            send_folder_to_dropbox(self.dropbox_client, dir)
+        #for dir in self.synced_dirs:
+            #send_folder_to_dropbox(self.dropbox_client, dir)
+        
+        # Dummy code: Send an empty tex file to dropbox
+        #with open("test.txt", "r") as file:
+            #file.read()
+        folders_data: dict = self.dropbox_client.files_list_folder(path = "/Apper/overleaf").entries
+        folder_names: list[str] = [obj.name for obj in folders_data]
+        pprint(folder_names)
+
+        #print(self.dropbox_)
+        #self.dropbox_client.files_upload(path="apper/overleaf/Project Thesis", f=file)
 
     def reset() -> None:
         pass

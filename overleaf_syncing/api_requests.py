@@ -94,6 +94,14 @@ def send_folder_to_dropbox(dropbox_client: Dropbox, folder_path: str) -> None:
             dropbox_client.files_upload(file_content, f"/{folder_path}/{file}")
 
 
+def get_projects_in_dropbox_overleaf_folder(dropbox_client: Dropbox) -> list[str]:
+    
+    projects = []
+    for entry in dropbox_client.files_list_folder(path="/Apps/overleaf").entries:
+        projects.append(entry.name)
+    return projects
+
+
 
 
 
