@@ -1,109 +1,48 @@
-#import requests
-#import webbrowser
 from dropbox import Dropbox
+import dropbox
 import os
-#
-#
-#def fetch_access_token(app_key: str, app_secret: str) -> str:
-#        
-#    REDIRECT_URI = 'https://localhost/'
-#    TOKEN_URL = "https://api.dropboxapi.com/oauth2/token"
-#    AUTHENTICATION_URL = f"https://www.dropbox.com/oauth2/authorize?client_id={app_key}&response_type=code&redirect_uri={REDIRECT_URI}"
-#    webbrowser.open(AUTHENTICATION_URL)
-#    
-#    ### This needs to be fetched automatically
-#    authorization_code = input("Enter the authorization code: ")
-#    
-#    data = {
-#        "code": authorization_code,
-#        "grant_type": "authorization_code",
-#        "client_id": app_key,
-#        "client_secret": app_secret,
-#        "redirect_uri": REDIRECT_URI,
-#    }
-#
-#    response = requests.post(TOKEN_URL, data=data)
-#    if response.status_code == 200:
-#        print(response.json())
-#        return response.json()["access_token"]
-#    else:
-#        print("Error: Unable to obtain access token")
-#        print(response.json())
-#        return None
 
 
-#import requests
-#import webbrowser
-#from flask import Flask, request
-#import threading
-#
-#app = Flask(__name__)
-#
-## Global variable to store the authorization code
-#authorization_code = None
-#
-#@app.route('/')
-#def get_authorization_code():
-#    global authorization_code
-#    authorization_code = request.args.get('code')  # Get the authorization code from the query parameters
-#    return "Authorization code received! You can close this window now."
-#
-#def start_local_server():
-#    app.run(port=5000)
-#
-#def fetch_access_token(app_key: str, app_secret: str) -> str:
-#    global authorization_code
-#
-#    REDIRECT_URI = 'http://localhost:5000/'
-#    TOKEN_URL = "https://api.dropboxapi.com/oauth2/token"
-#    AUTHENTICATION_URL = f"https://www.dropbox.com/oauth2/authorize?client_id={app_key}&response_type=code&redirect_uri={REDIRECT_URI}"
-#
-#    # Start a thread for Flask server
-#    threading.Thread(target=start_local_server).start()
-#
-#    # Open the Dropbox authorization URL
-#    webbrowser.open(AUTHENTICATION_URL)
-#    
-#    # Wait until the authorization code is received
-#    while authorization_code is None:
-#        pass  # Busy wait for the code (better to implement a proper wait)
-#
-#    # Exchange the authorization code for an access token
-#    data = {
-#        "code": authorization_code,
-#        "grant_type": "authorization_code",
-#        "client_id": app_key,
-#        "client_secret": app_secret,
-#        "redirect_uri": REDIRECT_URI,
-#    }
-#
-#    response = requests.post(TOKEN_URL, data=data)
-#    if response.status_code == 200:
-#        print(response.json())
-#        return response.json()["access_token"]
-#    else:
-#        print("Error: Unable to obtain access token")
-#        print(response.json())
-#        return None
-
-    
-def send_folder_to_dropbox(dropbox_client: Dropbox, folder_path: str) -> None:
-    for file in os.listdir(folder_path):
-        with open(f"{folder_path}/{file}", 'r') as file:
-            file_content = file.read()
-            dropbox_client.files_upload(file_content, f"/{folder_path}/{file}")
-
-
-def get_projects_in_dropbox_overleaf_folder(dropbox_client: Dropbox) -> list[str]:
-    
-    projects = []
-    for entry in dropbox_client.files_list_folder(path="/Apps/overleaf").entries:
-        projects.append(entry.name)
-    return projects
+def sanitize_path(path: str) -> str:
+    # Replace backslashes with forward slashes and remove redundant './'
+    path = path.replace("\\", "/").replace("//", "/")
+    # Remove any './' occurrences
+    path = path.replace("/./", "/")
+    # Ensure path starts with a slash
+    if not path.startswith("/"):
+        path = "/" + path
+    # Remove trailing slashes if present
+    if path.endswith("/"):
+        path = path.rstrip("/")
+    return path
 
 
 
+def upload_folder_to_dropbox(dbx: Dropbox, local_folder: str, dropbox_folder: str):
+    for root, dirs, files in os.walk(local_folder):
+        relative_path = os.path.relpath(root, local_folder)
+        dropbox_path = sanitize_path(dropbox_folder + "/" + relative_path)
 
+        if relative_path != ".":
+            try:
+                dbx.files_create_folder_v2(dropbox_path)
+            except dropbox.exceptions.ApiError as err:
+                if err.error.is_path() and err.error.get_path().is_conflict():
+                    pass
+                else:
+                    raise
 
+        for file_name in files:
+            local_file_path = os.path.join(root, file_name)
+            dropbox_file_path = sanitize_path(dropbox_path + "/" + file_name)
+
+            try:
+                with open(local_file_path, "rb") as f:
+                    dbx.files_upload(
+                        f.read(), dropbox_file_path, mode=dropbox.files.WriteMode.overwrite
+                    )
+                print(f"Uploaded {local_file_path} to {dropbox_file_path}")
+            except dropbox.exceptions.ApiError as e:
+                print(f"Failed to upload {local_file_path} to {dropbox_file_path}: {e}")
 
 

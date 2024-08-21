@@ -1,99 +1,142 @@
 from dropbox import Dropbox
 import os
-from .utilities import search_for_file_in_parent_folders, load_yaml_file, save_yaml_file, create_new_config_file, request_user_input
-from .api_requests import send_folder_to_dropbox
+from .utilities import (
+    search_for_file_in_parent_folders,
+    load_yaml_file,
+    save_yaml_file,
+    request_user_input,
+    print_list_with_indexes,
+    request_app_key,
+    request_app_secret,
+    decode_url,
+    search_for_folders,
+)
+from .api_requests import upload_folder_to_dropbox
 from pprint import pprint
+from .DropboxOAuthHandler import DropboxOAuthHandler
+from .ConfigurationHandler import ConfigurationHandler
+from .Secrets import Secrets
 
 
 class SyncClient:
 
     def __init__(self):
-        # TODO: Fix this: Set to the directory of the file that initializes the object manually now.
-        #dir_of_object_initialization: str = os.path.dirname(os.path.absdir(__file__))
-        dir_of_object_initialization: str = "/Users/eivindkolmannskog/overleaf-local-folder-syncing"
 
-        
-        self.is_authenticated: bool = False
+        self.configuration: ConfigurationHandler = ConfigurationHandler(
+            file_directory=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        )
 
-        # Check if already configured, by looking for config.yaml in parent folders
-        if search_for_file_in_parent_folders("config.yml", dir_of_object_initialization) is not None:
-            print("Configuration found")
-            self._config_file_path: str = os.path.join(search_for_file_in_parent_folders("config.yml", dir_of_object_initialization))
-            self._set_configuration()
+        secrets: Secrets = Secrets()
+        while secrets.CLIENT_ACCESS_TOKEN is None:
+            dropbox_oauth = DropboxOAuthHandler(
+                secrets.CLIENT_APP_KEY, secrets.CLIENT_APP_SECRET
+            )
+            if dropbox_oauth.is_authorized():
+                secrets.update_tokens(
+                    dropbox_oauth.access_token, dropbox_oauth.refresh_token
+                )
+            else:
+                print("Authorization failed. Trying again...")
+
+        # Make a dropbox client
+        try:
+            self.dropbox_client: Dropbox = Dropbox(
+                oauth2_access_token=secrets.CLIENT_ACCESS_TOKEN,
+                oauth2_refresh_token=secrets.CLIENT_REFRESH_TOKEN,
+                app_key=secrets.CLIENT_APP_KEY,
+                app_secret=secrets.CLIENT_APP_SECRET,
+            )
+        except:
+            raise Exception(
+                "Could not create a Dropbox client. Please check your credentials."
+            )
+
+        if self.configuration.overleaf_project_directory is None:
+            response: str = request_user_input(
+                "Paste the URL of the dropbox URL you want to sync to"
+            )
+            self.set_overleaf_project(response)
+
+    def set_overleaf_project(self, url: str) -> None:
+        """
+        Sets the overleaf project to the given URL if it is valid.
+        """
+        decoded_url = decode_url(url)
+
+        # Check if valid URL
+        try:
+            self.configuration.overleaf_project_directory = "/" + decoded_url.lstrip(
+                "/home"
+            )
+
+            # This will fail if path does not exist
+            self.dropbox_client.files_list_folder(
+                path=self.configuration.overleaf_project_directory.lower()
+            )
+
+            self.configuration.save_config_file()
+            print(
+                f"Changed overleaf project to: {self.configuration.overleaf_project_directory}"
+            )
+
+        except:
+            raise Exception("Invalid URL")
+
+    def add_synced_folder(self, folder_name: str) -> None:
+        # Search for folder in the project directory, and all subdirectories
+        folder_paths = search_for_folders(folder_name, self.configuration.file_directory)
+        filtered_folders = ... # Filter out the folders that are subfolders that have the same name as the prent folder is eliminated
+        if len(folder_paths) != 0:
+            self.add_synced_directory(folder_paths)
         else:
-            print("Configuration not found")
-            self._config_file_path: str = os.path.join(dir_of_object_initialization, "config.yml")
-            create_new_config_file(self._config_file_path)
-            self._set_configuration()
-            self._request_secrets()
-            self._save_configuration()
+            print(f"Folder {folder_name} not found in directory {self.configuration.file_directory}")
 
+    def add_synced_directory(self, directory: str | list[str]) -> None:
+        """
+        Adds one directory to the synced directories list. If the directory input is a list, all directories will be added.
+        """
+        if isinstance(directory, str):
+            # Handle for single directory
+            self.configuration.synced_directories.append(directory)
 
-        # Set up a valid dropbox client
-        while not self.is_authenticated:
-            try:
-                #access_token: str = fetch_access_token(self._app_key, self._app_secret)
-                self.dropbox_client: Dropbox = Dropbox(oauth2_access_token=self._access_token, app_key=self._app_key, app_secret=self._app_secret)
-                print("Authentication successful")
-                self.is_authenticated = True
-            except:
-                print("Error: Unable to authenticate. Please try again")
-                self._request_secrets()
-                self._save_configuration()
+        elif isinstance(directory, list):
+            # Handle for multiple directories'
+            for dir in directory:
+                self.configuration.synced_directories.append(dir)
+        else:
+            raise Exception("Invalid input type for directory")
 
+    def sync(self) -> None:
+        """
+        Syncs the selected folders with the overleaf project, through dropbox.
+        """
+        print("Syncing...")
+        for directory in self.configuration.synced_directories:
+            upload_folder_to_dropbox(
+                self.dropbox_client,
+                directory,
+                self.configuration.overleaf_project_directory.lower(),
+            ),
+        print("Syncing complete!")
 
-        # Sync the directories
-        if self.synced_dirs is not None:
-            self._sync_directories()
+    def reset(self) -> None:
+        # Delete the config file
+        try:
+            print(os.path.join(self.configuration.file_directory, "config.yml"))
+            os.remove(os.path.join(self.configuration.file_directory, "config.yml"))
+        except:
+            print("Config file already deleted")
 
+        try:
+            os.remove(".env")
+        except:
+            print(".env file already deleted")
 
-    def _get_config_data(self):
-        return load_yaml_file(self._config_file_path)
+        self.configuration.file_directory = None
+        self.configuration.synced_directories = []
+        self.configuration.overleaf_project_directory = None
 
-    def _set_configuration(self):
-        config_data: dict = self._get_config_data()
-        self.synced_dirs: list[str] = config_data.get("synced_dirs")
-        self._app_secret: str = config_data.get("app_secret")
-        self._app_key: str = config_data.get("app_key")
-        self._access_token: str = config_data.get("access_token")
-    
-    def _request_secrets(self):
-        self._app_key: str = request_user_input("Enter the app key")
-        self._app_secret: str = request_user_input("Enter the app secret")
-        self._access_token: str = request_user_input("Enter your access token")
+        print("Reset complete!")
 
-    def _save_configuration(self):
-        save_yaml_file(self._config_file_path, {"synced_dirs": self.synced_dirs, "app_key": self._app_key, "app_secret": self._app_secret, "access_token": self._access_token})
-
-    def add_synced_dir(self, dir: str):
-        #TODO:  Some validation to ensure the dir is valid
-
-        # THIS IS DANGEROUS
-        if dir not in self.synced_dirs:
-            self.synced_dirs.append(dir)
-        self._save_configuration()
-
-    def _sync_directories(self):
-        #for dir in self.synced_dirs:
-            #send_folder_to_dropbox(self.dropbox_client, dir)
-        
-        # Dummy code: Send an empty tex file to dropbox
-        #with open("test.txt", "r") as file:
-            #file.read()
-        folders_data: dict = self.dropbox_client.files_list_folder(path = "/Apper/overleaf").entries
-        folder_names: list[str] = [obj.name for obj in folders_data]
-        pprint(folder_names)
-
-        #print(self.dropbox_)
-        #self.dropbox_client.files_upload(path="apper/overleaf/Project Thesis", f=file)
-
-    def reset() -> None:
-        pass
-        
-
-    
-
-    
     def __str__(self) -> str:
-        return f"This is a SyncClient object"
-    
+        return f"SyncClient is connected with dropbox account, {self.dropbox_client.users_get_current_account().name.display_name}, {self.dropbox_client.users_get_current_account().email}"
