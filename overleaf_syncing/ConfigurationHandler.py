@@ -6,9 +6,9 @@ class ConfigurationHandler:
     def __init__(self, file_directory: str):
 
         config_file_path = self.file_directory = search_for_file_in_parent_folders(
-                target_file_name="config.yml", search_file_path=file_directory
-            )
-        
+            target_file_name="config.yml", search_file_path=file_directory
+        )
+
         if config_file_path is not None:
             self.file_directory = os.path.dirname(config_file_path)
         else:
@@ -16,10 +16,8 @@ class ConfigurationHandler:
             self.synced_directories = []
             self.overleaf_project_directory = None
             self.save_config_file()
-        
-        self.load_config_file()
 
-        print(self.__dict__)
+        self.load_config_file()
 
     def save_config_file(self) -> None:
         """
@@ -42,9 +40,16 @@ class ConfigurationHandler:
         self.synced_directories = config_data.get("synced_directories")
         self.overleaf_project_directory = config_data.get("overleaf_project_directory")
 
-
     def add_synced_directory(self, directory: str) -> None:
         if directory not in self.synced_directories:
             self.synced_directories.append(directory)
             self.save_config_file()
-            
+
+    def remove_synced_directory(self, directory: str) -> None:
+        if directory in self.synced_directories:
+            self.synced_directories.remove(directory)
+            self.save_config_file()
+
+    def remove_all_synced_directories(self) -> None:
+        self.synced_directories = []
+        self.save_config_file()

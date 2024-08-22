@@ -84,12 +84,21 @@ class SyncClient:
 
     def add_synced_folder(self, folder_name: str) -> None:
         # Search for folder in the project directory, and all subdirectories
-        folder_paths = search_for_folders(folder_name, self.configuration.file_directory)
-        filtered_folders = ... # Filter out the folders that are subfolders that have the same name as the prent folder is eliminated
+        folder_paths = search_for_folders(
+            folder_name, self.configuration.file_directory
+        )
+        filtered_folders = (
+            ...
+        )  # Filter out the folders that are subfolders that have the same name as the prent folder is eliminated
         if len(folder_paths) != 0:
             self.add_synced_directory(folder_paths)
         else:
-            print(f"Folder {folder_name} not found in directory {self.configuration.file_directory}")
+            print(
+                f"Folder {folder_name} not found in directory {self.configuration.file_directory}"
+            )
+
+    def remove_all_synced_folders(self) -> None:
+        self.configuration.remove_all_synced_directories()
 
     def add_synced_directory(self, directory: str | list[str]) -> None:
         """
@@ -106,17 +115,30 @@ class SyncClient:
         else:
             raise Exception("Invalid input type for directory")
 
-    def sync(self) -> None:
+    def upload_synced_folders(self) -> None:
         """
-        Syncs the selected folders with the overleaf project, through dropbox.
+        Uploads the selected folders with the overleaf project, through dropbox.
         """
-        print("Syncing...")
+
         for directory in self.configuration.synced_directories:
             upload_folder_to_dropbox(
                 self.dropbox_client,
                 directory,
                 self.configuration.overleaf_project_directory.lower(),
             ),
+
+    def erase_unmatched_files(self) -> None:
+        """
+        Erases files in the overleaf project that are not in the local synced directories. The SyncClient.upload() method only uploads
+        """
+
+    def sync(self) -> None:
+        """
+        Syncing the selected folders with the overleaf project, through dropbox.
+        """
+        print("Syncing...")
+        self.upload_synced_folders()
+        self.erase_unmatched_files()
         print("Syncing complete!")
 
     def reset(self) -> None:
