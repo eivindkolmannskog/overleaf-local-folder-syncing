@@ -1,14 +1,24 @@
-This is a tool for automatrically sync a folder within a dev environment with overleaf, going through Dropbox. This is perfect for scientific writing when plots generated locally needs to be able to be updated without the hassle of upload manually each time.
+This is a tool for automatrically sync a folder within a dev environment with overleaf, going through Dropbox. This is perfect for scientific writing when plots generated locally needs to be able to be updated without the hassle of upload manually each time. To use it, you use this project as a python module locally, and connect your desired dropbox account 
 
 
 
 ### Setup
 First we need to set up a dropbox account or use an existing one, and with this account allow this app to be synced.
+1. Sync Overleaf with Dropbox (requires a paid overleaf account)
+2. Install the module with pip:
+   ```
 
-1. Go to https://www.dropbox.com/developers/apps and click "Create app", and follow the steps. This should give you an app key and an app secret, which we will need very soon.
-2. Install the module using pip install
+   pip install "git+https://github.com/eivindkolmannskog/overleaf-local-folder-syncing.git"
+
+   ```
+   
+3. Go to https://www.dropbox.com/developers/apps and click "Create app", and follow the steps. This should give you an app key and an app secret, which we will need very soon.
 
 
+
+### Usage
+
+###Examples
 
 ### Contribute
 1. Clone repository locally.
@@ -34,23 +44,7 @@ First we need to set up a dropbox account or use an existing one, and with this 
    pip install -r requirements.txt
    
    ```
-
-### Adding pre-commits
-Assumes you ar navigated to the root repo folder. 
-1. Open/create pre-commit file with:
-    ```
-    
-    notepad .git/hooks/pre-commit
-    
-    ```
-
-2. Edit the file with your commands, and save!
-3. Make the pre-commit hook executable:
-   ```
-
-   git update-index --chmod=+x .git/hooks/pre-commit
-
-   ```
+   
 
 
 
