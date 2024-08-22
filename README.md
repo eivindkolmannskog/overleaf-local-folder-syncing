@@ -5,12 +5,13 @@ This is a tool for automatrically sync a folder within a dev environment with ov
 ### Setup
 First we need to set up a dropbox account or use an existing one, and with this account allow this app to be synced.
 1. Sync Overleaf with Dropbox (requires a paid overleaf account)
-2. Install the module with pip:
+2. In your local project folder, install the module with pip:
    ```
 
    pip install "git+https://github.com/eivindkolmannskog/overleaf-local-folder-syncing.git"
 
    ```
+   It is recommended to use a virtual environment.
    
 3. Go to https://www.dropbox.com/developers/apps and click "Create app", and follow the steps. This should give you an app key and an app secret, which we will need very soon.
 
