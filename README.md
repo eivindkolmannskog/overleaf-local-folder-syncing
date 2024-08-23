@@ -3,15 +3,17 @@ This project is still under development, and may be prone to errors.
 
 ### Setup
 First we need to set up a dropbox account or use an existing one, and with this account allow this app to be synced.
-1. Sync Overleaf with Dropbox (requires a paid overleaf account). Follow the steps in [this](https://www.overleaf.com/learn/how-to/Dropbox_Synchronization) 
-2. In your local project folder, install the module with pip:
+1. Sync Overleaf with Dropbox (requires a paid overleaf account). Follow the instructions given by Overleaf [here](https://www.overleaf.com/learn/how-to/Dropbox_Synchronization).
+2. Go to https://www.dropbox.com/developers/apps and click "Create app", and follow the steps. This should give you an app key and an app secret, which we will need very soon.
+3. In your local project folder, install the module with pip:
    ```
    pip install "git+https://github.com/eivindkolmannskog/overleaf-local-folder-syncing.git@main#egg=overleaf-sync"
    ```
    It is recommended to use a virtual environment.
    
-3. Go to https://www.dropbox.com/developers/apps and click "Create app", and follow the steps. This should give you an app key and an app secret, which we will need very soon.
+4. 
 
+![image](https://github.com/user-attachments/assets/e1296401-ce2d-4ce7-998d-09567dd48432)
 
 
 ### Usage
