@@ -1,10 +1,9 @@
 This is a tool for automatrically sync a folder within a dev environment with overleaf, going through Dropbox. This is perfect for scientific writing when plots generated locally needs to be able to be updated without the hassle of upload manually each time. To use it, you use this project as a python module locally, and connect your desired dropbox account 
-
-
+This project is still under development, and may be prone to errors.
 
 ### Setup
 First we need to set up a dropbox account or use an existing one, and with this account allow this app to be synced.
-1. Sync Overleaf with Dropbox (requires a paid overleaf account)
+1. Sync Overleaf with Dropbox (requires a paid overleaf account). Follow the steps in [this](https://www.overleaf.com/learn/how-to/Dropbox_Synchronization) 
 2. In your local project folder, install the module with pip:
    ```
    pip install "git+https://github.com/eivindkolmannskog/overleaf-local-folder-syncing.git@main#egg=overleaf-sync"
