@@ -24,7 +24,7 @@ First we need to set up a dropbox account or use an existing one, and with this 
    It is recommended to use a virtual environment.
 
 8. Make a new .py file in the root directory of your local project folder, and paste in
-   python```
+   ```python
    import os
    from overleaf_syncing.SyncClient import SyncClient
 
