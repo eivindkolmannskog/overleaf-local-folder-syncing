@@ -30,6 +30,21 @@ First we need to set up a dropbox account or use an existing one, and with this 
 
    # Create a client
    client = SyncClient()
+   ```
+When you run this, the configuration will start. You will here need to paste in your app key and app secret which was given in step 4. Also the dropbox url of your project needs to be provided, and you will find it by navigating to your dropfox folder in your web browser. e.g https://www.dropbox.com/home/Apper/Overleaf/Project%20Thesis, where the project folder is called "Project Thesis". You will also be redirected to your browser to accept that your app is connecting to your dropbox.
+
+This script will be extended later, and how to set up the syncing will be explained in "Usage" below.
+
+
+### Usage
+When your app and script is set up as described in "Setup", only thing you will have to do is to run your script.
+
+   ```python
+   import os
+   from overleaf_syncing.SyncClient import SyncClient
+
+   # Create a client
+   client = SyncClient()
 
    # Root of the project directory, which will be the location of this file
    root = os.path.dirname(__file__)
@@ -45,14 +60,6 @@ First we need to set up a dropbox account or use an existing one, and with this 
    # Upload the folders to the Overleaf project
    client.upload_synced_folders()
    ```
-The uploading to Overleaf will be executed when you run this script. Change the folder names to the actual folder names in your project. You can have as many folders as you want. See "Examples" below for more info.
-   
-
-
-
-
-### Usage
-When your app and script is set up as described in "Setup", only thing you will have to do is to run your script.
 
 ###Examples
 
