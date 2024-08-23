@@ -26,25 +26,24 @@ First we need to set up a dropbox account or use an existing one, and with this 
 8. Make a new .py file in the root directory of your local project folder, and paste in
    python```
    import os
-from overleaf_syncing.SyncClient import SyncClient
+   from overleaf_syncing.SyncClient import SyncClient
 
-# Create a client
-client = SyncClient()
+   # Create a client
+   client = SyncClient()
 
-# Root of the project directory, which will be the location of this file
-root = os.path.dirname(__file__)
+   # Root of the project directory, which will be the location of this file
+   root = os.path.dirname(__file__)
 
-# Define paths we want to sync. You can create as many as you want
-path_1 = os.path.join(root, "<folder_name_1>")
-path_2 = os.path.join(root, "<folder_name_2>")
+   # Define paths we want to sync. You can create as many as you want
+   path_1 = os.path.join(root, "<folder_name_1>")
+   path_2 = os.path.join(root, "<folder_name_2>")
 
-# Tell the client to sync the defined paths.
-# Either give a list of paths or a single path.
-client.add_synced_directory([path_1, path_2])
+   # Tell the client to sync the defined paths.
+   # Either give a list of paths or a single path.
+   client.add_synced_directory([path_1, path_2])
 
-# Upload the folders to the Overleaf project
-client.upload_synced_folders()
-
+   # Upload the folders to the Overleaf project
+   client.upload_synced_folders()
    ```
 The uploading to Overleaf will be executed when you run this script. Change the folder names to the actual folder names in your project. You can have as many folders as you want. See "Examples" below for more info.
    
