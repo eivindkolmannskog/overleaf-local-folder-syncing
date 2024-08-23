@@ -7,9 +7,7 @@ First we need to set up a dropbox account or use an existing one, and with this 
 1. Sync Overleaf with Dropbox (requires a paid overleaf account)
 2. In your local project folder, install the module with pip:
    ```
-
-   pip install "git+https://github.com/eivindkolmannskog/overleaf-local-folder-syncing.git"
-
+   pip install "git+https://github.com/eivindkolmannskog/overleaf-local-folder-syncing.git@main#egg=overleaf-sync"
    ```
    It is recommended to use a virtual environment.
    
