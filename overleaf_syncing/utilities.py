@@ -49,33 +49,6 @@ def request_app_key() -> str:
     return request_user_input("Enter the app key")
 
 
-# def choose_overleaf_project(dropbox_client: Dropbox) -> str:
-#    """
-#    This function is used to choose an overleaf project in the clients dropbox, and return the directory as a string.
-#    """
-#    directory_chosen: bool = False
-#    while not directory_chosen:
-#        folders_data: dict = self.dropbox_client.files_list_folder(
-#            path=self.directories.dropbox_sync_to_dir
-#        ).entries
-#        folder_names: list[str] = [obj.name for obj in folders_data]
-#
-#        print_list_with_indexes(folder_names)
-#
-#        root_dir: str = request_user_input(
-#            "Choose a folder by inserting the index number"
-#        )
-#
-#        print("You have chosen: ", folder_names[int(root_dir)])
-#        self.directories.dropbox_sync_to_dir += "/" + folder_names[int(root_dir)]
-#
-#        sync_dir_chosen: str = request_user_input(
-#            "Is this the directory you want to sync to? [Y/n]:"
-#        )
-#
-#        if sync_dir_chosen.lower() is "y":
-#            directory_chosen = True
-
 
 def decode_url(url: str) -> str:
     parsed_url: str = urllib.parse.urlparse(url)
@@ -97,5 +70,15 @@ def search_for_folders(folder_name, root_directory) -> list[str]:
             matching_folders.append(os.path.join(dirpath, folder_name))
     
     return matching_folders
+
+
+
+def dropbox_url_to_dropbox_path(url: str) -> str:
+    """
+    Converts a dropbox URL to a dropbox path used with their API.
+    """
+
+    decoded_url = decode_url(url)
+    return "/" + decoded_url.strip("home/")
 
 

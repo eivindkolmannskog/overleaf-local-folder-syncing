@@ -1,15 +1,10 @@
 from dropbox import Dropbox
 import os
 from .utilities import (
-    search_for_file_in_parent_folders,
-    load_yaml_file,
-    save_yaml_file,
     request_user_input,
-    print_list_with_indexes,
-    request_app_key,
-    request_app_secret,
     decode_url,
     search_for_folders,
+    dropbox_url_to_dropbox_path,
 )
 from .api_requests import upload_folder_to_dropbox
 from pprint import pprint
@@ -20,19 +15,22 @@ from .Secrets import Secrets
 
 class SyncClient:
 
-    def __init__(self):
+    def __init__(self, reset: bool = False) -> None:
+
+        if reset:
+            self._reset()
 
         self.configuration: ConfigurationHandler = ConfigurationHandler(
             file_directory=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         )
 
-        secrets: Secrets = Secrets()
-        while secrets.CLIENT_ACCESS_TOKEN is None:
+        self.secrets: Secrets = Secrets()
+        while self.secrets.CLIENT_ACCESS_TOKEN is None:
             dropbox_oauth = DropboxOAuthHandler(
-                secrets.CLIENT_APP_KEY, secrets.CLIENT_APP_SECRET
+                self.secrets.CLIENT_APP_KEY, self.secrets.CLIENT_APP_SECRET
             )
             if dropbox_oauth.is_authorized():
-                secrets.update_tokens(
+                self.secrets.update_tokens(
                     dropbox_oauth.access_token, dropbox_oauth.refresh_token
                 )
             else:
@@ -41,10 +39,10 @@ class SyncClient:
         # Make a dropbox client
         try:
             self.dropbox_client: Dropbox = Dropbox(
-                oauth2_access_token=secrets.CLIENT_ACCESS_TOKEN,
-                oauth2_refresh_token=secrets.CLIENT_REFRESH_TOKEN,
-                app_key=secrets.CLIENT_APP_KEY,
-                app_secret=secrets.CLIENT_APP_SECRET,
+                oauth2_access_token=self.secrets.CLIENT_ACCESS_TOKEN,
+                oauth2_refresh_token=self.secrets.CLIENT_REFRESH_TOKEN,
+                app_key=self.secrets.CLIENT_APP_KEY,
+                app_secret=self.secrets.CLIENT_APP_SECRET,
             )
         except:
             raise Exception(
@@ -61,13 +59,13 @@ class SyncClient:
         """
         Sets the overleaf project to the given URL if it is valid.
         """
-        decoded_url = decode_url(url)
 
         # Check if valid URL
         try:
-            self.configuration.overleaf_project_directory = "/" + decoded_url.lstrip(
-                "/home"
+            self.configuration.overleaf_project_directory = dropbox_url_to_dropbox_path(
+                url
             )
+            print(self.configuration.overleaf_project_directory)
 
             # This will fail if path does not exist
             self.dropbox_client.files_list_folder(
@@ -141,7 +139,7 @@ class SyncClient:
         self.erase_unmatched_files()
         print("Syncing complete!")
 
-    def reset(self) -> None:
+    def _reset(self) -> None:
         # Delete the config file
         try:
             print(os.path.join(self.configuration.file_directory, "config.yml"))
@@ -154,9 +152,13 @@ class SyncClient:
         except:
             print(".env file already deleted")
 
-        self.configuration.file_directory = None
-        self.configuration.synced_directories = []
-        self.configuration.overleaf_project_directory = None
+        try:
+            os.environ.pop("CLIENT_APP_KEY", None)
+            os.environ.pop("CLIENT_APP_SECRET", None)
+            os.environ.pop("CLIENT_ACCESS_TOKEN", None)
+            os.environ.pop("CLIENT_REFRESH_TOKEN", None)
+        except:
+            print("Environment variables already deleted")
 
         print("Reset complete!")
 
