@@ -1,3 +1,13 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "OverleafSyncing"
+version = "0.1.0"
+description = "Syncing local folder with Overleaf"
+authors = [{ name = "Eivind Kolmannskog", email = "eivind.sk@hotmail.com" }]
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]  # Adjust if your source code is not in the src directory
