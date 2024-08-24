@@ -42,6 +42,10 @@ class OverleafSyncing:
                 app_key=self.secrets.CLIENT_APP_KEY,
                 app_secret=self.secrets.CLIENT_APP_SECRET,
             )
+            print(
+                f"Successfully connected to Dropbox account: {self.dropbox_client.users_get_current_account().name.display_name}, {self.dropbox_client.users_get_current_account().email}"
+            )
+
         except:
             self._reset()
             raise Exception(

@@ -43,25 +43,25 @@ class DropboxOAuthHandler:
     def _authorize_and_get_tokens(self):
         # Step 1: Get the authorization URL and open it in the browser
         auth_url = self._get_authorization_url()
-        #print(f"Opening the following URL in the browser: {auth_url}")
+        # print(f"Opening the following URL in the browser: {auth_url}")
         webbrowser.open(auth_url)
 
         # Step 2: Start the HTTP server to capture the authorization code
         httpd = self._start_http_server()
-        #print("Waiting for the authorization code...")
+        # print("Waiting for the authorization code...")
 
         # Wait for a single request (Dropbox will send a GET request after authorization)
         httpd.handle_request()
 
         # Step 3: Get the authorization code from the server and exchange it for tokens
         auth_code = httpd.auth_code
-        #print(f"Received authorization code: {auth_code}")
+        # print(f"Received authorization code: {auth_code}")
 
         try:
             self._exchange_code_for_tokens(auth_code)
-            #print("Tokens retrieved successfully!")
+            # print("Tokens retrieved successfully!")
         except Exception as e:
-            #print(f"Error during token retrieval: {e}")
+            # print(f"Error during token retrieval: {e}")
             self.access_token = None
             self.refresh_token = None
 
@@ -101,7 +101,7 @@ class DropboxOAuthHandler:
 
         if response.status_code == 200:
             self.access_token = new_tokens.get("access_token")
-            #pprint(new_tokens)
+            # pprint(new_tokens)
             return self.access_token
         else:
             raise Exception(f"Failed to refresh access token: {new_tokens}")
@@ -111,6 +111,10 @@ class DropboxOAuthHandler:
 
 
 class OAuthCodeHandler(BaseHTTPRequestHandler):
+    def log_message(self, format, *args):
+        # Override this method to suppress the default logging
+        return
+
     def do_GET(self):
         # Parse the query string to extract the authorization code
         query_components = parse_qs(urlparse(self.path).query)
