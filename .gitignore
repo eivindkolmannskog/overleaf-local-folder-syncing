@@ -8,6 +8,5 @@ __pycache__/
 *.py[cod]
 *$py.class
 config.yml
-
-mock
+mock/
 main.py
