@@ -5,9 +5,25 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "OverleafSyncing"
 version = "0.1.0"
-description = "Syncing local folder with Overleaf"
-authors = [{ name = "Eivind Kolmannskog", email = "eivind.sk@hotmail.com" }]
+description = "A brief description of your project"
+authors = [{ name = "Eivind Kolmannskog", email = "you@example.com" }]
+requires-python = ">=3.11"
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    # Add more classifiers as needed
+]
 dependencies = []
 
 [tool.setuptools.packages.find]
 where = ["src"]  # Adjust if your source code is not in the src directory
+
+[project.optional-dependencies]
+testing = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "mypy>=0.910",
+    "flake8>=3.9",
+    "tox>=3.24",
+]
