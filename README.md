@@ -26,10 +26,22 @@ First we need to set up a dropbox account or use an existing one, and with this 
 8. Make a new .py file in the root directory of your local project folder, and paste in
    ```python
    import os
-   from overleaf_syncing.SyncClient import SyncClient
+   from overleaf_syncing.OverleafSyncing import OverleafSyncing
+
+   # Dropbox URL of your Overleaf project:
+   DROPBOX_URL = "https://www.dropbox.com/url/of/your/overleaf/project"
+   # Root of your project directory, which will be the directory of this file.
+   root_dir: str = os.path.dirname(__file__)
 
    # Create a client
-   client = SyncClient()
+   client = OverleafSyncing(dropbox_url=DROPBOX_URL)
+
+   # Define paths we want to sync. You can create as many as you want
+   synced_folder_1: str = os.path.join(root_dir, "<your_folder_name>")
+   client.add_synced_directories(synced_folder_1)
+
+   # Upload the folders to the Overleaf project
+   client.upload_synced_folders()
    ```
 When you run this, the configuration will start. You will here need to paste in your app key and app secret which was given in step 4. Also the dropbox url of your project needs to be provided, and you will find it by navigating to your dropfox folder in your web browser. e.g https://www.dropbox.com/home/Apper/Overleaf/Project%20Thesis, where the project folder is called "Project Thesis". You will also be redirected to your browser to accept that your app is connecting to your dropbox.
 
